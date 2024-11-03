@@ -36,11 +36,12 @@ def readData(baudrate, udp_ip, udp_port):
 
         # Tenta conectar contínuamente a uma porta serial
         try:
-            ser = connectSerial()
             if ser is None:
-                print("Reconectando em 3 segundos...")
-                time.sleep(3)
-                continue
+                ser = connectSerial()
+                if ser is None:
+                    print("Reconectando em 3 segundos...")
+                    time.sleep(3)
+                    continue
 
             if ser.in_waiting > 0:  # Se há dados esperando para serem lidos do Arduino
                 
