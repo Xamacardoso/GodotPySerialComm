@@ -14,19 +14,18 @@ def readData(baudrate, udp_ip, udp_port):
 
     def connectSerial():
         '''Tenta conectar na primeira porta serial que está enviando informações'''
-        while True:
-            ports = serial.tools.list_ports.comports(); # Pega a lista de portas que estão usando conexão serial
-            for port in ports:
-                try:
-                    ser = serial.Serial(port.device, baudrate, timeout=1)  # Tenta conectar com a porta serial do Arduino
-                    print(f"Conectado à porta serial: {port.device}")
-                    return ser
+        ports = serial.tools.list_ports.comports(); # Pega a lista de portas que estão usando conexão serial
+        for port in ports:
+            try:
+                ser = serial.Serial(port.device, baudrate, timeout=1)  # Tenta conectar com a porta serial do Arduino
+                print(f"Conectado à porta serial: {port.device}")
+                return ser
 
-                except (serial.SerialException, IndexError) as e:
-                    print("Erro de comunicação serial: ", e);
+            except (serial.SerialException, IndexError) as e:
+                print("Erro de comunicação serial: ", e);
 
-            print("Sem portas seriais disponíveis para conexão")
-            return None
+        print("Sem portas seriais disponíveis para conexão")
+        return None
 
     ser = None
     
@@ -35,13 +34,13 @@ def readData(baudrate, udp_ip, udp_port):
     udp_adress = (udp_ip, udp_port)
     while True:
 
+        # Tenta conectar contínuamente a uma porta serial
         try:
+            ser = connectSerial()
             if ser is None:
-                ser = connectSerial()
-                if ser is None:
-                    print("Reconectando em 3 segundos...")
-                    time.sleep(3)
-                    continue
+                print("Reconectando em 3 segundos...")
+                time.sleep(3)
+                continue
 
             if ser.in_waiting > 0:  # Se há dados esperando para serem lidos do Arduino
                 
@@ -60,7 +59,7 @@ def readData(baudrate, udp_ip, udp_port):
 
         except (serial.SerialException, Exception) as e:
             print(f"Erro de leitura/envio de dados: {e}")
-            ser.close()
+            ser.close() # Fecha a conexão serial para poder tentar uma nova conexão
             ser = None
 
 
@@ -69,6 +68,8 @@ if __name__ == "__main__":
         baudrate = int(sys.argv[1])
         ip = sys.argv[2]
         port = int(sys.argv[3])
+
+        # Inicia a leitura serial em threadding para aumento de desempenho
         serial_thread = threading.Thread(target=readData, args=(baudrate, ip, port))
         serial_thread.start()
         serial_thread.join()
