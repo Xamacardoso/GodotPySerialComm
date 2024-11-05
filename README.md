@@ -53,6 +53,11 @@ Windows
 pip install pyserial
 ```
 
+No Linux, talvez seja necessário atualizar o pyserial para uma versão mais recente caso ele já esteja instalado. Use o seguinte comando:
+```
+pip3 install --upgrade pyserial
+```
+
 # Utilização
 
 Com a Godot, Python e pyserial instalados, clone o repositório na pasta de sua preferência, abra a Godot e escaneie a pasta desse projeto. Em seguida, rode a cena principal ou qualquer outra cena.
